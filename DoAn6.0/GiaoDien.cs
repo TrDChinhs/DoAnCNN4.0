@@ -31,18 +31,17 @@ namespace DoAn6._0
 
         private void button2_Click(object sender, EventArgs e) 
         {
-            if (!string.IsNullOrEmpty(this.currentLoggedInUsername))
+            string loggedInUsername = currentLoggedInUsername; 
+
+            if (string.IsNullOrEmpty(loggedInUsername))
             {
-                CapNhatTaiKhoan capNhatTaiKhoan = new CapNhatTaiKhoan(this.currentLoggedInUsername);
-                capNhatTaiKhoan.Show();
+                MessageBox.Show("Không xác định được tài khoản đang đăng nhập.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
-            else
-            {
-                MessageBox.Show("Lỗi: Không xác định được thông tin người dùng để cập nhật.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                DangNhap loginForm = new DangNhap();
-                loginForm.Show();
-                loginForm.FormClosed += (s, args) => this.Show();
-            }
+
+            // Tạo và hiển thị form cập nhật, truyền username vào
+            CapNhatTaiKhoan formCapNhat = new CapNhatTaiKhoan(loggedInUsername);
+            formCapNhat.Show(); // Dùng ShowDialog để khóa form GiaoDien lại
         }
 
         private void btnThongTin_Click(object sender, EventArgs e)

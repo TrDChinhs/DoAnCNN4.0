@@ -1,74 +1,103 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Data.SqlClient;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DoAn6._0
 {
     public partial class CapNhatTaiKhoan : Form
     {
-        private string currentTenTaiKhoan;
-        Modify modify; 
+        private Modify modify;
+        private string _currentUsername; // Lưu tên tài khoản đang đăng nhập
+        private string _currentCrId;     // Lưu ID Chủ ruộng tương ứng
 
-        public CapNhatTaiKhoan(string tenTaiKhoan) 
+        // Constructor nhận tên tài khoản
+        public CapNhatTaiKhoan(string username)
         {
             InitializeComponent();
-            this.currentTenTaiKhoan = tenTaiKhoan; 
-            modify = new Modify(); 
-        }
+            modify = new Modify();
+            _currentUsername = username;
 
-        private void CapNhatTaiKhoan_Load(object sender, EventArgs e)
-        {
-            LoadUserInfo(); 
-        }
-
-        private void LoadUserInfo()
-        {
-            if (string.IsNullOrEmpty(currentTenTaiKhoan))
+            if (string.IsNullOrEmpty(_currentUsername))
             {
-                MessageBox.Show("Không xác định được tài khoản!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                this.Close(); 
+                MessageBox.Show("Không xác định được tên tài khoản.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Load += (s, e) => this.Close(); // Đóng form nếu không có username
                 return;
             }
 
-            txtTenTaiKhoan.Text = currentTenTaiKhoan;
-            txtTenTaiKhoan.ReadOnly = true;
-
-            DataRow userInfo = modify.GetChuRuongInfo(currentTenTaiKhoan);
-
-            if (userInfo != null)
+            // Lấy CR_ID tương ứng ngay khi khởi tạo (nếu cần dùng sớm)
+            _currentCrId = modify.GetCrIdFromUsername(_currentUsername);
+            if (string.IsNullOrEmpty(_currentCrId))
             {
-                txtHoTen.Text = userInfo["CR_HoTen"] != DBNull.Value ? userInfo["CR_HoTen"].ToString() : "";
-                txtSoCMND.Text = userInfo["CR_CMND"] != DBNull.Value ? userInfo["CR_CMND"].ToString() : "";
-                txtDiaChi.Text = userInfo["CR_DiaChi"] != DBNull.Value ? userInfo["CR_DiaChi"].ToString() : "";
+                MessageBox.Show("Không tìm thấy thông tin Chủ ruộng liên kết với tài khoản này.", "Lỗi Dữ Liệu", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // Có thể không đóng form ngay, cho phép xem tên TK nhưng không lưu được
+                // Hoặc đóng form:
+                // this.Load += (s, e) => this.Close();
+            }
+        }
 
-                if (userInfo["CR_NgaySinh"] != DBNull.Value)
-                {
-                    dateTimePicker1.Value = Convert.ToDateTime(userInfo["CR_NgaySinh"]);
-                }
-                else
-                {
-                    dateTimePicker1.Value = DateTime.Now; 
-                }
+        // Sự kiện Form Load
 
-                if (userInfo["CR_GioiTinh"] != DBNull.Value)
+        private void CapNhatTaiKhoan_Load_1(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(_currentUsername)) return; // Thoát nếu không có username
+
+            LoadAccountInfo();
+
+            // Gắn sự kiện cho CheckBox để đảm bảo chỉ chọn 1
+            checkBoxNam.CheckedChanged += CheckBoxGioiTinh_CheckedChanged;
+            checkBoxNu.CheckedChanged += CheckBoxGioiTinh_CheckedChanged;
+        }
+
+        // Hàm load thông tin tài khoản lên form
+        private void LoadAccountInfo()
+        {
+            txtTenTaiKhoan.Text = _currentUsername; // Hiển thị tên tài khoản
+            txtTenTaiKhoan.ReadOnly = true;       // Không cho sửa tên tài khoản
+
+            DataRow dr = modify.GetChuRuongInfo(_currentUsername);
+
+            if (dr != null)
+            {
+                try
                 {
-                    string gioiTinh = userInfo["CR_GioiTinh"].ToString().Trim();
-                    if (gioiTinh.Equals("Nam", StringComparison.OrdinalIgnoreCase))
+                    txtHoTen.Text = dr["CR_HoTen"]?.ToString();
+                    txtSoCMND.Text = dr["CR_CMND"]?.ToString();
+                    txtDiaChi.Text = dr["CR_DiaChi"]?.ToString();
+
+                    // Xử lý Ngày sinh (nullable)
+                    if (dr["CR_NgaySinh"] != DBNull.Value && dr["CR_NgaySinh"] != null)
                     {
-                        checkBoxNam.Checked = true;
-                        checkBoxNu.Checked = false;
+                        dateTimePicker1.Value = Convert.ToDateTime(dr["CR_NgaySinh"]);
+                        dateTimePicker1.Checked = true; // Đánh dấu có giá trị
+                        dateTimePicker1.Format = DateTimePickerFormat.Short; // Định dạng ngày ngắn
                     }
-                    else if (gioiTinh.Equals("Nữ", StringComparison.OrdinalIgnoreCase) || gioiTinh.Equals("Nu", StringComparison.OrdinalIgnoreCase))
+                    else
                     {
-                        checkBoxNam.Checked = false;
-                        checkBoxNu.Checked = true;
+                        dateTimePicker1.Checked = false; // Không có giá trị
+                        dateTimePicker1.Format = DateTimePickerFormat.Custom; // Có thể ẩn ngày tháng đi
+                        dateTimePicker1.CustomFormat = " ";
+                    }
+
+
+                    // Xử lý Giới tính
+                    string gioiTinh = dr["CR_GioiTinh"]?.ToString();
+                    if (!string.IsNullOrEmpty(gioiTinh))
+                    {
+                        if (gioiTinh.Equals("Nam", StringComparison.OrdinalIgnoreCase))
+                        {
+                            checkBoxNam.Checked = true;
+                            checkBoxNu.Checked = false;
+                        }
+                        else if (gioiTinh.Equals("Nữ", StringComparison.OrdinalIgnoreCase) || gioiTinh.Equals("Nu", StringComparison.OrdinalIgnoreCase))
+                        {
+                            checkBoxNu.Checked = true;
+                            checkBoxNam.Checked = false;
+                        }
+                        else
+                        {
+                            checkBoxNam.Checked = false;
+                            checkBoxNu.Checked = false;
+                        }
                     }
                     else
                     {
@@ -76,38 +105,31 @@ namespace DoAn6._0
                         checkBoxNu.Checked = false;
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    // Không có thông tin giới tính
-                    checkBoxNam.Checked = false;
-                    checkBoxNu.Checked = false;
+                    MessageBox.Show($"Lỗi khi hiển thị thông tin tài khoản: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
-                // Sự kiện để đảm bảo chỉ chọn 1 giới tính
-                checkBoxNam.CheckedChanged += GioiTinh_CheckedChanged;
-                checkBoxNu.CheckedChanged += GioiTinh_CheckedChanged;
             }
             else
             {
-                MessageBox.Show("Không tìm thấy thông tin chi tiết cho tài khoản này.\nCó thể tài khoản mới được tạo và chưa có thông tin trong QLChuRuong.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                // Có thể để trống các trường hoặc đặt giá trị mặc định
-                txtHoTen.Text = "";
-                txtSoCMND.Text = "";
-                txtDiaChi.Text = "";
-                dateTimePicker1.Value = DateTime.Now;
-                checkBoxNam.Checked = false;
-                checkBoxNu.Checked = false;
-                // Gắn sự kiện check cho trường hợp chưa có dữ liệu
-                checkBoxNam.CheckedChanged += GioiTinh_CheckedChanged;
-                checkBoxNu.CheckedChanged += GioiTinh_CheckedChanged;
+                // Có thể xảy ra nếu GetCrIdFromUsername thành công nhưng GetChuRuongInfo thất bại
+                MessageBox.Show("Không tìm thấy thông tin chi tiết của Chủ ruộng.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                // Vô hiệu hóa nút lưu nếu không load được info
+                btnLuu.Enabled = false;
             }
+            // Xử lý lại format khi Checked = false sau khi gán giá trị
+            dateTimePicker1.ValueChanged += (s, ev) => {
+                if (dateTimePicker1.Checked) dateTimePicker1.Format = DateTimePickerFormat.Short;
+            };
         }
 
-        // Đảm bảo chỉ một CheckBox giới tính được chọn tại một thời điểm
-        private void GioiTinh_CheckedChanged(object sender, EventArgs e)
+
+        // Đảm bảo chỉ một CheckBox giới tính được chọn
+        private void CheckBoxGioiTinh_CheckedChanged(object sender, EventArgs e)
         {
             CheckBox changedCheckbox = sender as CheckBox;
-            if (changedCheckbox == null || !changedCheckbox.Checked) return; // Chỉ xử lý khi check=true
+            if (changedCheckbox == null || !changedCheckbox.Checked)
+                return;
 
             if (changedCheckbox == checkBoxNam)
             {
@@ -119,17 +141,21 @@ namespace DoAn6._0
             }
         }
 
-        private void btnLuu_Click(object sender, EventArgs e)
+        // Sự kiện nhấn nút Lưu
+
+        private void btnLuu_Click_1(object sender, EventArgs e)
         {
-            // 1. Lấy dữ liệu từ các controls
+            if (string.IsNullOrEmpty(_currentCrId))
+            {
+                MessageBox.Show("Không thể lưu do không xác định được ID Chủ ruộng.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // --- Thu thập dữ liệu từ Form ---
             string hoTen = txtHoTen.Text.Trim();
-            string cmnd = txtSoCMND.Text.Trim();
-            string diaChi = txtDiaChi.Text.Trim();
-            DateTime? ngaySinh = null; 
-
-            ngaySinh = dateTimePicker1.Value;
-
-            string gioiTinh = null;
+            // Lấy ngày sinh, chỉ lấy giá trị nếu Checked = true
+            DateTime? ngaySinh = dateTimePicker1.Checked ? (DateTime?)dateTimePicker1.Value : null;
+            string gioiTinh = "";
             if (checkBoxNam.Checked)
             {
                 gioiTinh = "Nam";
@@ -138,32 +164,54 @@ namespace DoAn6._0
             {
                 gioiTinh = "Nữ";
             }
+            string cmnd = txtSoCMND.Text.Trim();
+            string diaChi = txtDiaChi.Text.Trim();
 
-            // 2. (Tùy chọn) Validate dữ liệu (ví dụ: Họ tên không được trống)
-            if (string.IsNullOrEmpty(hoTen))
+            // --- Validation cơ bản ---
+            if (string.IsNullOrWhiteSpace(hoTen))
             {
-                MessageBox.Show("Vui lòng nhập Họ và Tên.", "Thiếu thông tin", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Họ và tên không được để trống.", "Thiếu thông tin", MessageBoxButtons.OK);
                 txtHoTen.Focus();
                 return;
             }
+            // Thêm các validation khác nếu cần (ví dụ: định dạng CMND...)
 
-            // 3. Gọi phương thức cập nhật trong lớp Modify
-            bool success = modify.UpdateChuRuongInfo(currentTenTaiKhoan, hoTen, ngaySinh, gioiTinh, cmnd, diaChi);
 
-            // 4. Hiển thị thông báo kết quả
-            if (success)
+            // --- Gọi hàm cập nhật ---
+            try
             {
-                MessageBox.Show("Cập nhật thông tin thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                bool success = modify.UpdateChuRuongInfo(_currentCrId, hoTen, ngaySinh, gioiTinh, cmnd, diaChi);
+
+                if (success)
+                {
+                    MessageBox.Show("Cập nhật thông tin tài khoản thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    this.Close(); // Đóng form sau khi cập nhật thành công
+                }
+                else
+                {
+                    // Lỗi có thể đã được báo trong Modify.UpdateChuRuongInfo
+                    MessageBox.Show("Cập nhật thông tin thất bại.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi không mong muốn khi lưu: {ex.Message}", "Lỗi hệ thống", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // Thêm xử lý sự kiện ValueChanged cho DateTimePicker để đổi format khi check/uncheck
+
+        private void dateTimePicker1_ValueChanged_1(object sender, EventArgs e)
+        {
+            if (dateTimePicker1.Checked)
+            {
+                dateTimePicker1.Format = DateTimePickerFormat.Short;
             }
             else
             {
-                MessageBox.Show("Cập nhật thông tin thất bại! Vui lòng kiểm tra lại hoặc liên hệ quản trị viên.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                dateTimePicker1.Format = DateTimePickerFormat.Custom;
+                dateTimePicker1.CustomFormat = " "; // Ẩn ngày tháng khi không check
             }
         }
-
-        private void panel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-    }
+    } 
 }

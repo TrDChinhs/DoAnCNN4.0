@@ -63,7 +63,6 @@ namespace DoAn6._0
                     MessageBox.Show("Không thể tải danh sách ruộng.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     cmbRuong.Enabled = false;
                 }
-                MessageBox.Show($"Số item trong cmbRuong sau khi load: {cmbRuong.Items.Count}");
             }
             catch (Exception ex)
             {

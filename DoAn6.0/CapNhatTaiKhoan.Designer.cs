@@ -93,7 +93,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(342, 158);
+            this.label4.Location = new System.Drawing.Point(347, 158);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(91, 16);
             this.label4.TabIndex = 0;
@@ -140,6 +140,7 @@
             this.dateTimePicker1.Name = "dateTimePicker1";
             this.dateTimePicker1.Size = new System.Drawing.Size(200, 22);
             this.dateTimePicker1.TabIndex = 2;
+            this.dateTimePicker1.ValueChanged += new System.EventHandler(this.dateTimePicker1_ValueChanged_1);
             // 
             // checkBoxNam
             // 
@@ -181,7 +182,7 @@
             this.btnLuu.TabIndex = 4;
             this.btnLuu.Text = "Lưu";
             this.btnLuu.UseVisualStyleBackColor = false;
-            this.btnLuu.Click += new System.EventHandler(this.btnLuu_Click);
+            this.btnLuu.Click += new System.EventHandler(this.btnLuu_Click_1);
             // 
             // panel1
             // 
@@ -205,7 +206,6 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(671, 261);
             this.panel1.TabIndex = 5;
-            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
             // CapNhatTaiKhoan
             // 
@@ -217,7 +217,7 @@
             this.Name = "CapNhatTaiKhoan";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "CapNhatTaiKhoan";
-            this.Load += new System.EventHandler(this.CapNhatTaiKhoan_Load);
+            this.Load += new System.EventHandler(this.CapNhatTaiKhoan_Load_1);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.ResumeLayout(false);

@@ -76,7 +76,7 @@
             this.txtMatKhau.Name = "txtMatKhau";
             this.txtMatKhau.Size = new System.Drawing.Size(330, 50);
             this.txtMatKhau.TabIndex = 2;
-            this.txtMatKhau.Text = "\r\n  ";
+            this.txtMatKhau.Text = "\r\n";
             // 
             // txtTaiKhoan
             // 
@@ -88,7 +88,7 @@
             this.txtTaiKhoan.Name = "txtTaiKhoan";
             this.txtTaiKhoan.Size = new System.Drawing.Size(330, 50);
             this.txtTaiKhoan.TabIndex = 1;
-            this.txtTaiKhoan.Text = "\r\n  ";
+            this.txtTaiKhoan.Text = "\r\n";
             // 
             // btnDangNhap
             // 
@@ -165,7 +165,7 @@
             // 
             this.pictureBox4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(188)))), ((int)(((byte)(156)))));
             this.pictureBox4.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox4.Image")));
-            this.pictureBox4.Location = new System.Drawing.Point(72, 122);
+            this.pictureBox4.Location = new System.Drawing.Point(71, 121);
             this.pictureBox4.Name = "pictureBox4";
             this.pictureBox4.Size = new System.Drawing.Size(30, 30);
             this.pictureBox4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -185,7 +185,7 @@
             // 
             this.pictureBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(188)))), ((int)(((byte)(156)))));
             this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
-            this.pictureBox2.Location = new System.Drawing.Point(68, 59);
+            this.pictureBox2.Location = new System.Drawing.Point(67, 58);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(37, 37);
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;

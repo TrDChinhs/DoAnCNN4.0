@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.btnCapNhatTK = new System.Windows.Forms.Button();
             this.btnThongTin = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
@@ -43,15 +43,15 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // button2
+            // btnCapNhatTK
             // 
-            this.button2.Location = new System.Drawing.Point(994, 30);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(194, 47);
-            this.button2.TabIndex = 2;
-            this.button2.Text = "Cập nhật tài khoản";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.btnCapNhatTK.Location = new System.Drawing.Point(994, 30);
+            this.btnCapNhatTK.Name = "btnCapNhatTK";
+            this.btnCapNhatTK.Size = new System.Drawing.Size(194, 47);
+            this.btnCapNhatTK.TabIndex = 2;
+            this.btnCapNhatTK.Text = "Cập nhật tài khoản";
+            this.btnCapNhatTK.UseVisualStyleBackColor = true;
+            this.btnCapNhatTK.Click += new System.EventHandler(this.button2_Click);
             // 
             // btnThongTin
             // 
@@ -69,7 +69,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1232, 583);
             this.Controls.Add(this.btnThongTin);
-            this.Controls.Add(this.button2);
+            this.Controls.Add(this.btnCapNhatTK);
             this.Controls.Add(this.button1);
             this.Name = "GiaoDien";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -82,7 +82,7 @@
         #endregion
 
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button btnCapNhatTK;
         private System.Windows.Forms.Button btnThongTin;
     }
 }
